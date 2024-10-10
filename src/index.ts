@@ -1,16 +1,13 @@
-import DockerClient from "./client";
+import { DockerClient } from "./controller";
 
 const client = new DockerClient();
 
 (async () => {
     try {
-        const res = await client.listContainers({
-            all: true,
-            filters: {
-                isolation: ["hyperv"]
-            }
+        const res = await client.containers.listContainers({
+            all: true
         });
-        console.log(res);
+        console.log(res[0]);
     } catch (error) {
         console.error(error)
     }
