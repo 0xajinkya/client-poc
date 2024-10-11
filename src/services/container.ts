@@ -1,30 +1,26 @@
-import http from "http";
+// import http from "http";
+import type { CreateContainerBody } from "../types";
+import { type RequestOptions } from "http";
+import { http } from "./http";
 
 export class ContainerService {
-    public static listContainers<T>(options: http.RequestOptions): Promise<T> {
-        return new Promise((resolve, reject) => {
-            const req = http.request(options, (res) => {
-                let data = '';
+    public static listContainers<T>(options: RequestOptions): Promise<T> {
+        return http.handleRequest<T>(options);
+    }
 
-                res.on('data', (chunk) => {
-                    data += chunk;
-                });
+    public static createContainer<T>(options: RequestOptions, body: CreateContainerBody): Promise<T> {
+        return http.handleRequest<T>(options, body);
+    }
 
-                res.on('end', () => {
-                    try {
-                        const parsedData: T = JSON.parse(data);
-                        resolve(parsedData);
-                    } catch (e) {
-                        console.warn('Invalid response type, still returning for debug purposes!');
-                        reject(data);
-                    }
-                });
-            });
+    public static inspectContainer<T>(options: RequestOptions): Promise<T> {
+        return http.handleRequest<T>(options);
+    }
 
-            req.on('error', (e) => {
-                reject(e);
-            });
-            req.end();
-        });
+    public static listContainerProcesses<T>(options: RequestOptions): Promise<T> {
+        return http.handleRequest<T>(options);
+    }
+
+    public static getContainerLogs<T>(options: RequestOptions): Promise<T> {
+        return http.handleRequest<T>(options);
     }
 }
