@@ -23,4 +23,12 @@ export class ContainerService {
     public static getContainerLogs<T>(options: RequestOptions): Promise<T> {
         return http.handleRequest<T>(options);
     }
+
+    public static getChanges<T>(options: RequestOptions): Promise<T> {
+        return http.handleRequest<T>(options);
+    }
+
+    public static exportContainer<T>(options: RequestOptions): Promise<T> {
+        return http.handleRequest<T>(options);
+    }
 }

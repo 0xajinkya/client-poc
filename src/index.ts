@@ -21,11 +21,17 @@ const client = new DockerClient();
         //     id: "85682ca1a559b9f6d45b94c6f837ade2fa511d72358c88c326fd191fd66988f8",
         //     ps_args: "aux",
         // })
+        // const res = await client.containers.getContainerLogs({
+        //     id: "85682ca1a559",
+        //     stdout: true
+        // })
+        // const res = await client.containers.getChanges({
+        //     id: "f20f118a3d58"
+        // })
         const res = await client.containers.getContainerLogs({
             id: "85682ca1a559",
-            stdout: true
-        })
-        console.log(res);
+        });
+        console.log(res); 
     } catch (error) {
         console.error(error)
     }

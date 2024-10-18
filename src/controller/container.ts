@@ -1,5 +1,5 @@
 import type { DockerClient } from "./client";
-import type { ListContainersContainer, ListContainers, CreateContainerInput, CreateContainerResponse, InspectContainerInput, InspectContainerResponse, ListContainerProcessesBody, ListContainerProcessesResponse, GetContainerLogsRequest } from "../types";
+import type { ListContainersContainer, ListContainers, CreateContainerInput, CreateContainerResponse, InspectContainerInput, InspectContainerResponse, ListContainerProcessesBody, ListContainerProcessesResponse, GetContainerLogsRequest, GetChangesRequest, GetChangesResponse, ExportContainerRequest, GetContainerStatsRequestBody, ExportContainerResponse } from "../types";
 import { ContainerService } from "../services";
 import { type RequestOptions } from "http"
 export class ContainerClient {
@@ -15,7 +15,7 @@ export class ContainerClient {
         limit,
         size,
         filters
-    }: ListContainers = {}) {
+    }: ListContainers = {}): Promise<ListContainersContainer[]> {
         const queryParams = new URLSearchParams();
 
         if (all) queryParams.append('all', 'true');
@@ -34,10 +34,10 @@ export class ContainerClient {
                 'Content-Type': 'application/json',
             }
         };
-        return (await ContainerService.listContainers<ListContainersContainer[]>(opts))
+        return JSON.parse(await ContainerService.listContainers<string>(opts))
     };
 
-    public async createContainer(input: CreateContainerInput) {
+    public async createContainer(input: CreateContainerInput): Promise<CreateContainerResponse> {
         const {
             name, platform, ...body
         } = input;
@@ -54,10 +54,10 @@ export class ContainerClient {
                 'Content-Type': 'application/json',
             },
         }
-        return (await ContainerService.createContainer<CreateContainerResponse>(opts, body))
+        return JSON.parse(await ContainerService.createContainer<string>(opts, body))
     }
 
-    public async inspectContainer(input: InspectContainerInput) {
+    public async inspectContainer(input: InspectContainerInput): Promise<InspectContainerResponse> {
         const {
             id, size
         } = input;
@@ -72,10 +72,10 @@ export class ContainerClient {
                 'Content-Type': 'application/json',
             }
         };
-        return (await ContainerService.inspectContainer<InspectContainerResponse>(opts))
+        return JSON.parse(await ContainerService.inspectContainer<string>(opts))
     }
 
-    public async listContainerProcesses(input: ListContainerProcessesBody) {
+    public async listContainerProcesses(input: ListContainerProcessesBody): Promise<ListContainerProcessesResponse> {
         const {
             id,
             ps_args
@@ -91,7 +91,7 @@ export class ContainerClient {
                 'Content-Type': 'application/json',
             }
         };
-        return (await ContainerService.listContainerProcesses<ListContainerProcessesResponse>(opts))
+        return JSON.parse(await ContainerService.listContainerProcesses<string>(opts))
     }
 
     public async getContainerLogs(input: GetContainerLogsRequest) {
@@ -99,7 +99,7 @@ export class ContainerClient {
             id,
             ...query
         } = input;
-        const { 
+        const {
             follow,
             stdout,
             stderr,
@@ -112,13 +112,13 @@ export class ContainerClient {
             throw new Error("You must choose at least one stream (stdout or stderr).");
         }
         const queryParams = new URLSearchParams();
-        if(follow) queryParams.append('follow', 'true');
-        if(stdout) queryParams.append('stdout', 'true');
-        if(stderr) queryParams.append('stderr', 'true');
-        if(since) queryParams.append('since', since.toString());
-        if(until) queryParams.append('until', until.toString());
-        if(timestamps) queryParams.append('timestamps', 'true');
-        if(tail) queryParams.append('tail', tail);
+        if (follow) queryParams.append('follow', 'true');
+        if (stdout) queryParams.append('stdout', 'true');
+        if (stderr) queryParams.append('stderr', 'true');
+        if (since) queryParams.append('since', since.toString());
+        if (until) queryParams.append('until', until.toString());
+        if (timestamps) queryParams.append('timestamps', 'true');
+        if (tail) queryParams.append('tail', tail);
 
         const opts: RequestOptions = {
             socketPath: this.dockerClient.socketPath,
@@ -129,5 +129,37 @@ export class ContainerClient {
             }
         };
         return (await ContainerService.getContainerLogs<string>(opts))
+    }
+
+    public async getChanges(input: GetChangesRequest): Promise<GetChangesResponse> {
+        const {
+            id,
+        } = input;
+        const opts: RequestOptions = {
+            socketPath: this.dockerClient.socketPath,
+            path: this.dockerClient.path + `/containers/${id}/changes`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        return JSON.parse(await ContainerService.getChanges<string>(opts))
+    };
+
+    public async exportContainer(input: GetContainerStatsRequestBody): Promise<ExportContainerResponse> {
+        const {
+            id,
+            ...query
+        } = input;
+
+        const opts: RequestOptions = {
+            socketPath: this.dockerClient.socketPath,
+            path: this.dockerClient.path + `/containers/${id}/export`,
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+        return JSON.parse(await ContainerService.exportContainer<string>(opts))
     }
 }

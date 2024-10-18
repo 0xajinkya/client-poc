@@ -393,3 +393,110 @@ export type GetContainerLogsRequest = {
     timestamps?: boolean;
     tail?: string;
 }
+
+export type GetChangesRequest = {
+    id: string;
+}
+
+export type GetChangesResponse = {
+    Path: string;
+    Kind: 0 | 1 | 2
+}
+
+export type ExportContainerRequest = {
+    id: string
+}
+
+export type ExportContainerResponse = null;
+
+export type GetContainerStatsRequestBody = {
+    id: string;
+} & GetContainerStatsRequestQuery
+
+export type GetContainerStatsRequestQuery = {
+    stream?: boolean;
+    "one-shot": boolean;
+}
+
+export type NetworkStats = {
+    rx_bytes: number;
+    rx_packets: number;
+    rx_errors: number;
+    rx_dropped: number;
+    tx_bytes: number;
+    tx_packets: number;
+    tx_errors: number;
+    tx_dropped: number;
+}
+
+export type CPUUsage = {
+    cpu_usage: {
+        total_usage: number;
+        percpu_usage: number[];
+        usage_in_kernelmode: number;
+        usage_in_usermode: number;
+    },
+    system_cpu_usage: number;
+    online_cpus: number;
+    throttling_data: {
+        periods: number;
+        throttled_periods: number;
+        throttled_time: number;
+    }
+}
+export type GetContainerStatsResponse = {
+    read: string;
+    pids_stats: {
+        current: number;
+    },
+    networks: {
+        "eth0": NetworkStats;
+        "eth5": NetworkStats
+    },
+    memory_stats: {
+        stats: {
+            total_pgmajfault: number;
+            cache: number;
+            mapped_file: number;
+            total_inactive_file: number;
+            pgpgout: number;
+            rss: number;
+            total_mapped_file: number;
+            writeback: number;
+            unevictable: number;
+            pgpgin: number;
+            total_unevictable: number;
+            pgmajfault: number;
+            total_rss: number;
+            total_rss_huge: number;
+            total_writeback: number;
+            total_inactive_anon: number;
+            rss_huge: number;
+            hierarchical_memory_limit: number;
+            total_pgfault: number;
+            total_active_file: number;
+            active_anon: number;
+            total_active_anon: number;
+            total_pgpgout: number;
+            total_cache: number;
+            inactive_anon: number;
+            active_file: number;
+            pgfault: number;
+            inactive_file: number;
+            total_pgpgin: number;
+        },
+        max_usage: number;
+        usage: number;
+        failcnt: number;
+        limit: number
+    },
+    bilkio_stats: {
+        [key: string]: {
+            [key: string]: number;
+        } | {
+            [key: string]: number;
+        } | number | string;
+    },
+    cpu_stats: CPUUsage;
+    percpu_stats: CPUUsage;
+}
